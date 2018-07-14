@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using AutoMapper;
 using BL.Infrastructure;
+using DAL;
 using DAL.Models;
 using DAL.UnitOfWork;
 using DTO;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BL.Service
 {
@@ -15,11 +18,14 @@ namespace BL.Service
 
         IUnitOfWork Database { get; set; }
         private IMapper mapper;
+        private AirportContext context;
 
-        public ServiceTicket(IUnitOfWork uow, IMapper mapper)
+        public ServiceTicket(IUnitOfWork uow, IMapper mapper, AirportContext context)
         {
             Database = uow;
             this.mapper = mapper;
+            this.context = context;
+
         }
 
 
@@ -28,11 +34,11 @@ namespace BL.Service
             var tickets = Database.Set<Ticket>().Get();
             var flights = Database.Set<Flight>().Get();
 
-            var res= tickets
+            var res = tickets
                 .Join(flights,
                     t => t.FlightForeignKey,
                     f => f.Id,
-                    (t,f) => new Ticket() {Id = t.Id, Flight = f, Price = t.Price}).ToList();
+                    (t, f) => new Ticket() { Id = t.Id, Flight = f, Price = t.Price }).ToList();
             return mapper.Map<IEnumerable<TicketDTO>>(res);
         }
 
@@ -46,15 +52,31 @@ namespace BL.Service
             if (ticket == null)
                 throw new ValidationException("Ticket not found", "");
 
-            var res= new Ticket { Id = ticket.Id, Flight = ticket.Flight, Price = ticket.Price };
-            
+            var res = new Ticket { Id = ticket.Id, Flight = ticket.Flight, Price = ticket.Price };
+
             return mapper.Map<TicketDTO>(res);
         }
 
         public void PostTicket(int flightId, decimal price)
         {
-           
 
+            context.Tickets.Add(new Ticket(){
+                Price = price,
+                FlightForeignKey = flightId
+            });
+            context.SaveChanges();
+
+        }
+
+        public void PutTicket(int id, int flightId, decimal price)
+        {
+            context.Tickets.Update(new Ticket()
+                {
+                    Id = id,
+                    Price = price,
+                    FlightForeignKey = flightId
+                }
+            );
         }
 
 

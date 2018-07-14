@@ -66,7 +66,6 @@ namespace PL
             }
 
             app.UseMvc();
-
             SeedData.EnsurePopulated(app);
         }
     }

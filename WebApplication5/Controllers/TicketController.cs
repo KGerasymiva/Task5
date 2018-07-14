@@ -46,9 +46,10 @@ namespace PL.Controllers
 
         // PUT: api/Ticket/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] TicketDTO ticket)
+        public void Put(int id, [FromBody] JObject json)
         {
-            //TODO
+            var request = JsonConvert.DeserializeObject<Ticket>(json.ToString());
+            _serviceTicket.PutTicket(id,request.FlightId, request.Price);
         }
 
         // DELETE: api/ApiWithActions/5

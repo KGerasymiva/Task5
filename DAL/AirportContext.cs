@@ -13,6 +13,25 @@ namespace DAL
         public AirportContext(DbContextOptions<AirportContext> options)
             : base(options) { }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Flightattendant>()
+                .HasOne(p => p.Crew)
+                .WithMany(b => b.FlightAttendantsList)
+                .HasForeignKey(p => p.CrewForeignKey);
+
+            modelBuilder.Entity<Ticket>()
+                .HasOne(p => p.Flight)
+                .WithMany(b => b.Tickets)
+                .HasForeignKey(p => p.FlightForeignKey);
+
+        }
+
         public DbSet<Flight> Flights { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Departure> Departures { get; set; }
@@ -23,7 +42,7 @@ namespace DAL
         public DbSet<PlaneType> PlaneTypes { get; set; }
 
 
-        
+
 
     }
 

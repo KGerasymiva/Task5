@@ -11,6 +11,6 @@ namespace DTO
         public string Destination { get; set; }
         public string DeparturingTime { get; set; }
         public string ArrivingTime { get; set; }
-        public IEnumerable<TicketDTO> Tickets { get; set; }
+        public ICollection<TicketDTO> TicketsList { get; set; }
     }
 }

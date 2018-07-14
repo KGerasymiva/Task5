@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace DAL.Models
 {
@@ -10,6 +12,6 @@ namespace DAL.Models
         public string Destination { get; set; }
         public string DeparturingTime { get; set; }
         public string ArrivingTime { get; set; }
-        public IEnumerable<Ticket> Tickets { get; set; }
+        public ICollection<Ticket> Tickets { get; set; }
     }
 }

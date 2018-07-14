@@ -40,7 +40,7 @@ namespace BL.Service
             if (ticket == null)
                 throw new ValidationException("Ticket not found", "");
 
-            return new TicketDTO { Id = ticket.Id, FlightNumber = ticket.FlightNumber, Price = ticket.Price };
+            return new TicketDTO { Id = ticket.Id, FlightNumber = ticket.FlightForeignKey, Price = ticket.Price };
         }
 
         //public decimal GetPrice(int? id)
@@ -66,7 +66,7 @@ namespace BL.Service
         //    if (ticket == null)
         //        throw new ValidationException("Ticket not found", "");
 
-        //    return ticket.FlightNumber;
+        //    return ticket.FlightId;
         //}
 
 

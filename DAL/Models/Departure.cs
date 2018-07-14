@@ -1,12 +1,14 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL.Models
 {
     public class Departure : Entity
     {
-        public string FlightNumber { get; set; }
-        public string RealDepartingTime { get; set; }
-        public int Crue { get; set; }
+        public int FlightId { get; set; }
+        public string DepartingTime { get; set; }
+        public int Crew { get; set; }
         public int Plane { get; set; }
     }
 }

@@ -7,8 +7,7 @@ namespace DTO
     {
         public int Id { get; set; }
         public int Pilot { get; set; }
-        [NotMapped] 
-        public IEnumerable<int> FlightAttendance { get; set; }
+        public ICollection<FlightDTO> FlightAttendantsList { get; set; }
     }
 }
 

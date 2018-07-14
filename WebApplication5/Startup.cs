@@ -36,7 +36,11 @@ namespace PL
             services.AddTransient<IServiceTicket, ServiceTicket>();
             services.AddTransient<IServicePlaneType, ServicePlaneType>();
             services.AddTransient<IRepository<Entity>, Repository<Entity>>();
-            services.AddDbContext<AirportContext>(opt => opt.UseInMemoryDatabase());
+
+            var connection = @"Data Source=localhost\sqlexpress;Initial Catalog=AirportDB;Integrated Security=True";
+            services.AddDbContext<AirportContext>(options => options.UseSqlServer(connection));
+
+            //services.AddDbContext<AirportContext>(opt => opt.UseInMemoryDatabase());
             services.AddRouting();
             services.AddMvc();
             services.AddAutoMapper();

@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public decimal Price { get; set; }
-        public int FlightNumber { get; set; }
+        public string FlightNumber { get; set; }
     }
 }

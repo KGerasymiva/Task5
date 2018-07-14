@@ -30,6 +30,8 @@ namespace DAL
                 .WithMany(b => b.Tickets)
                 .HasForeignKey(p => p.FlightForeignKey);
 
+            modelBuilder.Entity<Ticket>().Property(p => p.Price)
+                .HasColumnType("money");
         }
 
         public DbSet<Flight> Flights { get; set; }

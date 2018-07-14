@@ -6,9 +6,13 @@ namespace DAL.Models
 {
     public class Departure : Entity
     {
-        public int FlightId { get; set; }
+        [ForeignKey("Flight")]
+        public int Flight { get; set; }
+        [DataType(DataType.Date)]
         public string DepartingTime { get; set; }
+        [ForeignKey("Crew")]
         public int Crew { get; set; }
+        [ForeignKey("Plane")]
         public int Plane { get; set; }
     }
 }

@@ -39,9 +39,11 @@ namespace DAL.Migrations
 
                     b.Property<int>("Crew");
 
-                    b.Property<string>("DepartingTime");
+                    b.Property<string>("DepartingTime")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
-                    b.Property<int>("FlightId");
+                    b.Property<int>("Flight");
 
                     b.Property<int>("Plane");
 
@@ -56,11 +58,15 @@ namespace DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ArrivingTime");
+                    b.Property<string>("ArrivingTime")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<string>("Departure");
 
-                    b.Property<string>("DeparturingTime");
+                    b.Property<string>("DeparturingTime")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<string>("Destination");
 
@@ -77,7 +83,9 @@ namespace DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BirthDay");
+                    b.Property<string>("BirthDay")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<int>("CrewForeignKey");
 
@@ -98,7 +106,9 @@ namespace DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("BirthDay");
+                    b.Property<string>("BirthDay")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate();
 
                     b.Property<int>("Experience");
 

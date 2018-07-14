@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.Mappers;
+using BL.Mapper;
 using DAL;
 using DAL.Models;
 using DAL.UnitOfWork;
@@ -16,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using BL.Service;
+using DTO;
 
 
 namespace PL
@@ -35,6 +38,7 @@ namespace PL
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IServiceTicket, ServiceTicket>();
             services.AddTransient<IServicePlaneType, ServicePlaneType>();
+            services.AddTransient<IMapper, Mapper>();
             services.AddTransient<IRepository<Entity>, Repository<Entity>>();
 
             var connection = @"Data Source=localhost\sqlexpress;Initial Catalog=AirportDB;Integrated Security=True";
@@ -43,8 +47,14 @@ namespace PL
             //services.AddDbContext<AirportContext>(opt => opt.UseInMemoryDatabase());
             services.AddRouting();
             services.AddMvc();
-            services.AddAutoMapper();
 
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutoMapperProfileConfiguration());
+            });
+
+            var mapper = config.CreateMapper();
+            services.AddSingleton(mapper);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

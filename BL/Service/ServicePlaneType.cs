@@ -13,18 +13,17 @@ namespace BL.Service
     public class ServicePlaneType : IServicePlaneType
     {
         IUnitOfWork Database { get; set; }
+        private IMapper mapper;
 
-        public ServicePlaneType(IUnitOfWork uow)
+        public ServicePlaneType(IUnitOfWork uow, IMapper mapper)
         {
             Database = uow;
+            this.mapper = mapper;
         }
 
         public IEnumerable<PlaneTypeDTO> GetPlaneTypes()
         {
-            // автомаппер для проекции одной коллекции на другую
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<PlaneType, PlaneTypeDTO>()).CreateMapper();
-
-            return mapper.Map<IEnumerable<PlaneType>, IEnumerable<PlaneTypeDTO>>(Database.Set<PlaneType>().Get());
+            return mapper.Map<IEnumerable<PlaneTypeDTO>>(Database.Set<PlaneType>().Get());
         }
 
         public PlaneTypeDTO GetPlaneType(int? id)
@@ -37,7 +36,7 @@ namespace BL.Service
             if (planeType == null)
                 throw new ValidationException("PlaneType not found", "");
 
-            return new PlaneTypeDTO() { Id = planeType.Id, Model = planeType.Model, Seats = planeType.Seats };
+            return mapper.Map<PlaneTypeDTO>(planeType);
         }
     }
 }

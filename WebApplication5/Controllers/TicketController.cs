@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BL;
 using BL.Service;
 using Microsoft.AspNetCore.Mvc;
 using DTO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace PL.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
-   public class TicketController : Controller
+    public class TicketController : Controller
     {
         private IServiceTicket _serviceTicket;
 
@@ -21,7 +24,7 @@ namespace PL.Controllers
         [HttpGet]
         public IEnumerable<TicketDTO> Get()
         {
-            
+
             return _serviceTicket.GetTickets();
         }
 
@@ -29,20 +32,21 @@ namespace PL.Controllers
         [HttpGet("{id}")]
         public TicketDTO Get(int id)
         {
-            return _serviceTicket.GetTicket(id) ;
+            return _serviceTicket.GetTicket(id);
         }
 
 
-        // POST: api/TicketDTO
+        // POST: api/Ticket
         [HttpPost]
-        public void Post([FromBody]string value)
+        public void Post([FromBody] JObject json)
         {
-            //TODO
+            var request = JsonConvert.DeserializeObject<Ticket>(json.ToString());
+            _serviceTicket.PostTicket(request.FlightId, request.Price);
         }
 
-        // PUT: api/TicketDTO/5
+        // PUT: api/Ticket/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public void Put(int id, [FromBody] TicketDTO ticket)
         {
             //TODO
         }
@@ -52,6 +56,12 @@ namespace PL.Controllers
         public void Delete(int id)
         {
             //TODO
+        }
+
+        private class Ticket
+        {
+            public int FlightId { get; set; }
+            public decimal Price { get; set; }
         }
     }
 }

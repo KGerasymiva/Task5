@@ -6,6 +6,7 @@ namespace DAL.Models
 {
     public class Crew : Entity
     {
+        [ForeignKey("Pilot")]
         public int Pilot { get; set; }
         public List<Flightattendant> FlightAttendantsList { get; set; }
     }

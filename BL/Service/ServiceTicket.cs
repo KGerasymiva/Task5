@@ -14,20 +14,26 @@ namespace BL.Service
     {
 
         IUnitOfWork Database { get; set; }
+        private IMapper mapper;
 
-        public ServiceTicket(IUnitOfWork uow)
+        public ServiceTicket(IUnitOfWork uow, IMapper mapper)
         {
             Database = uow;
+            this.mapper = mapper;
         }
 
 
         public IEnumerable<TicketDTO> GetTickets()
         {
-            // автомаппер для проекции одной коллекции на другую
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<Ticket, TicketDTO>()).CreateMapper();
+            var tickets = Database.Set<Ticket>().Get();
+            var flights = Database.Set<Flight>().Get();
 
-            return mapper.Map<IEnumerable<Ticket>, IEnumerable<TicketDTO>>(Database.Set<Ticket>().Get());
-
+            var res= tickets
+                .Join(flights,
+                    t => t.FlightForeignKey,
+                    f => f.Id,
+                    (t,f) => new Ticket() {Id = t.Id, Flight = f, Price = t.Price}).ToList();
+            return mapper.Map<IEnumerable<TicketDTO>>(res);
         }
 
         public TicketDTO GetTicket(int? id)
@@ -40,8 +46,17 @@ namespace BL.Service
             if (ticket == null)
                 throw new ValidationException("Ticket not found", "");
 
-            return new TicketDTO { Id = ticket.Id, FlightNumber = ticket.FlightForeignKey, Price = ticket.Price };
+            var res= new Ticket { Id = ticket.Id, Flight = ticket.Flight, Price = ticket.Price };
+            
+            return mapper.Map<TicketDTO>(res);
         }
+
+        public void PostTicket(int flightId, decimal price)
+        {
+           
+
+        }
+
 
         //public decimal GetPrice(int? id)
         //{
@@ -66,7 +81,7 @@ namespace BL.Service
         //    if (ticket == null)
         //        throw new ValidationException("Ticket not found", "");
 
-        //    return ticket.FlightId;
+        //    return ticket.Flight;
         //}
 
 

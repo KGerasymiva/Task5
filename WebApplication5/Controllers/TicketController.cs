@@ -56,7 +56,7 @@ namespace PL.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-            //TODO
+            _serviceTicket.DeleteTicket(id);
         }
 
         private class Ticket

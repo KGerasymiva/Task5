@@ -18,14 +18,11 @@ namespace BL.Service
 
         IUnitOfWork Database { get; set; }
         private IMapper mapper;
-        private AirportContext context;
 
-        public ServiceTicket(IUnitOfWork uow, IMapper mapper, AirportContext context)
+        public ServiceTicket(IUnitOfWork uow, IMapper mapper)
         {
             Database = uow;
             this.mapper = mapper;
-            this.context = context;
-
         }
 
 
@@ -59,24 +56,34 @@ namespace BL.Service
 
         public void PostTicket(int flightId, decimal price)
         {
-
-            context.Tickets.Add(new Ticket(){
+            Database.Set<Ticket>().Create(
+            new Ticket()
+            {
                 Price = price,
                 FlightForeignKey = flightId
             });
-            context.SaveChanges();
 
+            Database.SaveChages();
         }
 
         public void PutTicket(int id, int flightId, decimal price)
         {
-            context.Tickets.Update(new Ticket()
+            Database
+                .Set<Ticket>()
+                .Update(new Ticket()
                 {
                     Id = id,
                     Price = price,
-                    FlightForeignKey = flightId
-                }
-            );
+                    Flight = Database.Set<Flight>().Get().FirstOrDefault(t => t.Id == flightId)
+                });
+
+            Database.SaveChages();
+        }
+
+        public void DeleteTicket(int id)
+        {
+            Database.Set<Ticket>().Delete(Database.Set<Ticket>().Get().FirstOrDefault(t => t.Id == id));
+            Database.SaveChages();
         }
 
 

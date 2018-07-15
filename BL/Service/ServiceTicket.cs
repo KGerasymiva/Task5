@@ -16,27 +16,42 @@ namespace BL.Service
     public class ServiceTicket : IServiceTicket
     {
 
-        IUnitOfWork Database { get; set; }
+        private IUnitOfWork UOW { get; set; }
         private IMapper mapper;
 
         public ServiceTicket(IUnitOfWork uow, IMapper mapper)
         {
-            Database = uow;
+            UOW = uow;
             this.mapper = mapper;
         }
 
+        private IEnumerable<Ticket> GetTicketsFromDS()
+        {
+            return UOW.Set<Ticket>().Get();
+        }
+
+        private IEnumerable<Flight> GetFlightsFromDS()
+        {
+            return UOW.Set<Flight>().Get();
+        }
 
         public IEnumerable<TicketDTO> GetTickets()
         {
-            var tickets = Database.Set<Ticket>().Get();
-            var flights = Database.Set<Flight>().Get();
+            var tickets = GetTicketsFromDS();
+            var flights = GetFlightsFromDS();
+            var res = Tickets(tickets, flights);
 
+            return mapper.Map<IEnumerable<TicketDTO>>(res);
+        }
+
+        internal List<Ticket> Tickets(IEnumerable<Ticket> tickets, IEnumerable<Flight> flights)
+        {
             var res = tickets
                 .Join(flights,
                     t => t.FlightForeignKey,
                     f => f.Id,
-                    (t, f) => new Ticket() { Id = t.Id, Flight = f, Price = t.Price }).ToList();
-            return mapper.Map<IEnumerable<TicketDTO>>(res);
+                    (t, f) => new Ticket() {Id = t.Id, Flight = f, Price = t.Price}).ToList();
+            return res;
         }
 
         public TicketDTO GetTicket(int? id)
@@ -44,7 +59,7 @@ namespace BL.Service
             if (id == null)
                 throw new ValidationException($"There is no ticket with id {id}", "");
 
-            var ticket = Database.Set<Ticket>().Get().FirstOrDefault(x => x.Id == id.Value);
+            var ticket = GetTicketsFromDS().FirstOrDefault(x => x.Id == id.Value);
 
             if (ticket == null)
                 throw new ValidationException("Ticket not found", "");
@@ -56,19 +71,19 @@ namespace BL.Service
 
         public void PostTicket(int flightId, decimal price)
         {
-            Database.Set<Ticket>().Create(
+            UOW.Set<Ticket>().Create(
             new Ticket()
             {
                 Price = price,
                 FlightForeignKey = flightId
             });
 
-            Database.SaveChages();
+            UOW.SaveChages();
         }
 
         public void PutTicket(int id, int flightId, decimal price)
         {
-            Database
+            UOW
                 .Set<Ticket>()
                 .Update(new Ticket()
                 {
@@ -77,13 +92,13 @@ namespace BL.Service
                     FlightForeignKey = flightId
                 });
 
-            Database.SaveChages();
+            UOW.SaveChages();
         }
 
         public void DeleteTicket(int id)
         {
-            Database.Set<Ticket>().Delete(id);
-            Database.SaveChages();
+            UOW.Set<Ticket>().Delete(id);
+            UOW.SaveChages();
         }
 
 
@@ -92,7 +107,7 @@ namespace BL.Service
         //    if (id == null)
         //        throw new ValidationException($"There is no ticket", "");
 
-        //    var ticket = Database.Set<Ticket>().Get().FirstOrDefault(x => x.Id == id.Value);
+        //    var ticket = UOW.Set<Ticket>().Get().FirstOrDefault(x => x.Id == id.Value);
 
         //    if (ticket == null)
         //        throw new ValidationException("Ticket not found", "");
@@ -105,7 +120,7 @@ namespace BL.Service
         //    if (id == null)
         //        throw new ValidationException($"There is no ticket with id {id}", "");
 
-        //    var ticket = Database.Set<Ticket>().Get().FirstOrDefault(x => x.Id == id.Value);
+        //    var ticket = UOW.Set<Ticket>().Get().FirstOrDefault(x => x.Id == id.Value);
 
         //    if (ticket == null)
         //        throw new ValidationException("Ticket not found", "");

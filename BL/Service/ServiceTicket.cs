@@ -74,7 +74,7 @@ namespace BL.Service
                 {
                     Id = id,
                     Price = price,
-                    Flight = Database.Set<Flight>().Get().FirstOrDefault(t => t.Id == flightId)
+                    FlightForeignKey = flightId
                 });
 
             Database.SaveChages();
@@ -82,7 +82,7 @@ namespace BL.Service
 
         public void DeleteTicket(int id)
         {
-            Database.Set<Ticket>().Delete(Database.Set<Ticket>().Get().FirstOrDefault(t => t.Id == id));
+            Database.Set<Ticket>().Delete(id);
             Database.SaveChages();
         }
 

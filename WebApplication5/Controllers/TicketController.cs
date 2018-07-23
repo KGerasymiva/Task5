@@ -14,9 +14,9 @@ namespace PL.Controllers
     [Route("api/[controller]")]
     public class TicketController : Controller
     {
-        private IServiceTicket _serviceTicket;
+        private IService<TicketDTO> _serviceTicket;
 
-        public TicketController(IServiceTicket serviceTicket)
+        public TicketController(IService<TicketDTO> serviceTicket)
         {
             this._serviceTicket = serviceTicket;
         }
@@ -26,7 +26,7 @@ namespace PL.Controllers
         public IActionResult Get()
         {
 
-            return Ok(_serviceTicket.GetTickets());
+            return Ok(_serviceTicket.Get());
         }
 
         // GET: api/TicketDTO/5
@@ -35,7 +35,7 @@ namespace PL.Controllers
         {
             try
             {
-                var ticket = _serviceTicket.GetTicket(id);
+                var ticket = _serviceTicket.Get(id);
                 return Ok(ticket);
             }
             catch (ValidationException e)
@@ -50,13 +50,13 @@ namespace PL.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] TicketDTO ticket)
         {
-            //ticket.Id = 0;
+            ticket.Id = 0;
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             try
             {
-                _serviceTicket.PostTicket(ticket);
+                _serviceTicket.Post(ticket);
                 return Ok(ticket);
             }
             catch (ValidationException e)
@@ -75,7 +75,7 @@ namespace PL.Controllers
             ticketDto.Id = id;
             try
             {
-                _serviceTicket.PutTicket(ticketDto);
+                _serviceTicket.Put(ticketDto);
                 return Ok(ticketDto);
             }
             catch (Exception e)
@@ -89,7 +89,7 @@ namespace PL.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
-            _serviceTicket.DeleteTicket(id);
+            _serviceTicket.Delete(id);
         }
 
         private class Ticket

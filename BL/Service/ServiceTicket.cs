@@ -14,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace BL.Service
 {
-    public class ServiceTicket : IServiceTicket
+    public class ServiceTicket : IService<TicketDTO>
     {
 
         private IUnitOfWork UOW { get; set; }
@@ -36,7 +36,7 @@ namespace BL.Service
             return UOW.Set<Flight>().Get();
         }
 
-        public IEnumerable<TicketDTO> GetTickets()
+        public IEnumerable<TicketDTO> Get()
         {
             var tickets = GetTicketsFromDS();
             var flights = GetFlightsFromDS();
@@ -70,7 +70,7 @@ namespace BL.Service
             return mapper;
         }
 
-        public TicketDTO GetTicket(int id)
+        public TicketDTO Get(int id)
         {
             if (id == 0)
                 throw new ValidationException($"Incorrect id value", "");
@@ -88,10 +88,11 @@ namespace BL.Service
             return mapper.Map<TicketDTO>(ticket);
         }
 
-        public void PostTicket(TicketDTO ticketDto)
+        public void Post(TicketDTO ticketDto)
         {
-            if (ticketDto.FlightNumber == null && ticketDto.Price==0)
+            if (ticketDto.FlightNumber == null || ticketDto.Price==0 || ticketDto.Id!=0)
                 throw new ValidationException("Incorrect input data", "");
+
             if (GetFlightsFromDS().FirstOrDefault(f => f.Number == ticketDto.FlightNumber) == null)
                 throw new ValidationException($"There is no such FlightNumber={ticketDto.FlightNumber}", "");
 
@@ -101,21 +102,27 @@ namespace BL.Service
             UOW.SaveChages();
         }
 
-        public void PutTicket(TicketDTO ticketDto)
+        public void Put(TicketDTO ticketDto)
         {
             if (ticketDto == null)
                 throw new ValidationException("Incorrect input data", "");
+
+            if (ticketDto.FlightNumber == null || ticketDto.Price == 0 || ticketDto.Id==0)
+                throw new ValidationException("Incorrect input data", "");
+
             if (GetTicketsFromDS().FirstOrDefault(t => t.Id == ticketDto.Id) == null)
                 throw new ValidationException($"There is no ticket with Id = {ticketDto.Id}", "");
+
             if (GetFlightsFromDS().FirstOrDefault(f => f.Number == ticketDto.FlightNumber) == null)
                 throw new ValidationException($"There is no such FlightNumber={ticketDto.FlightNumber}", "");
+
             var ticket = PostPutMapper(ticketDto).Map<Ticket>(ticketDto);
 
             UOW.Set<Ticket>().Update(ticket);
             UOW.SaveChages();
         }
 
-        public void DeleteTicket(int id)
+        public void Delete(int id)
         {
             UOW.Set<Ticket>().Delete(id);
             UOW.SaveChages();

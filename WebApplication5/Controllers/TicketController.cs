@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using DTO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using BL.Infrastructure;
 
 namespace PL.Controllers
 {
@@ -22,34 +23,66 @@ namespace PL.Controllers
 
         // GET: api/Ticket
         [HttpGet]
-        public IEnumerable<TicketDTO> Get()
+        public IActionResult Get()
         {
 
-            return _serviceTicket.GetTickets();
+            return Ok(_serviceTicket.GetTickets());
         }
 
         // GET: api/TicketDTO/5
         [HttpGet("{id}")]
-        public TicketDTO Get(int id)
+        public IActionResult Get(int id)
         {
-            return _serviceTicket.GetTicket(id);
+            try
+            {
+                var ticket = _serviceTicket.GetTicket(id);
+                return Ok(ticket);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(new { Exception = e.Message });
+            }
+            
         }
 
 
         // POST: api/Ticket
         [HttpPost]
-        public void Post([FromBody] JObject json)
+        public IActionResult Post([FromBody] TicketDTO ticket)
         {
-            var request = JsonConvert.DeserializeObject<Ticket>(json.ToString());
-            _serviceTicket.PostTicket(request.FlightId, request.Price);
+            //ticket.Id = 0;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                _serviceTicket.PostTicket(ticket);
+                return Ok(ticket);
+            }
+            catch (ValidationException e)
+            {
+                return BadRequest(new {Exception = e.Message});
+            }
+           
         }
 
         // PUT: api/Ticket/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] JObject json)
+        public IActionResult Put(int id, [FromBody] TicketDTO ticketDto)
         {
-            var request = JsonConvert.DeserializeObject<Ticket>(json.ToString());
-            _serviceTicket.PutTicket(id,request.FlightId, request.Price);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            ticketDto.Id = id;
+            try
+            {
+                _serviceTicket.PutTicket(ticketDto);
+                return Ok(ticketDto);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new { Exception = e.Message });
+            }
+            
         }
 
         // DELETE: api/ApiWithActions/5

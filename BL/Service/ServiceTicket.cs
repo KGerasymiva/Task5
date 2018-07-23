@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using AutoMapper;
 using BL.Infrastructure;
@@ -50,48 +51,67 @@ namespace BL.Service
                 .Join(flights,
                     t => t.FlightForeignKey,
                     f => f.Id,
-                    (t, f) => new Ticket() {Id = t.Id, Flight = f, Price = t.Price}).ToList();
+                    (t, f) => new Ticket() { Id = t.Id, Flight = f, Price = t.Price }).ToList();
             return res;
         }
 
-        public TicketDTO GetTicket(int? id)
+        private IMapper PostPutMapper(TicketDTO ticketDto)
         {
-            if (id == null)
-                throw new ValidationException($"There is no ticket with id {id}", "");
+            var flight = GetFlightsFromDS().FirstOrDefault(f => f.Number == ticketDto.FlightNumber);
 
-            var ticket = GetTicketsFromDS().FirstOrDefault(x => x.Id == id.Value);
+            var mapper = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<TicketDTO, Ticket>().ForMember(opt => opt.Flight, opt => opt.MapFrom(c => flight))
+                    .ForMember(opt => opt.FlightForeignKey, opt => opt.MapFrom(c => flight.Id));
+                
+            })
+                .CreateMapper();
+
+            return mapper;
+        }
+
+        public TicketDTO GetTicket(int id)
+        {
+            if (id == 0)
+                throw new ValidationException($"Incorrect id value", "");
+
+            if (GetTicketsFromDS().FirstOrDefault(t => t.Id == id) == null)
+                throw new ValidationException($"There is no ticket with Id = {id}", "");
+
+            var ticket = GetTicketsFromDS().FirstOrDefault(x => x.Id == id);
+
+            ticket.Flight = GetFlightsFromDS().FirstOrDefault(f => f.Id == ticket.FlightForeignKey);
 
             if (ticket == null)
                 throw new ValidationException("Ticket not found", "");
 
-            var res = new Ticket { Id = ticket.Id, Flight = ticket.Flight, Price = ticket.Price };
-
-            return mapper.Map<TicketDTO>(res);
+            return mapper.Map<TicketDTO>(ticket);
         }
 
-        public void PostTicket(int flightId, decimal price)
+        public void PostTicket(TicketDTO ticketDto)
         {
-            UOW.Set<Ticket>().Create(
-            new Ticket()
-            {
-                Price = price,
-                FlightForeignKey = flightId
-            });
+            if (ticketDto.FlightNumber == null && ticketDto.Price==0)
+                throw new ValidationException("Incorrect input data", "");
+            if (GetFlightsFromDS().FirstOrDefault(f => f.Number == ticketDto.FlightNumber) == null)
+                throw new ValidationException($"There is no such FlightNumber={ticketDto.FlightNumber}", "");
 
+            var ticket = PostPutMapper(ticketDto).Map<Ticket>(ticketDto);
+
+            UOW.Set<Ticket>().Create(ticket);
             UOW.SaveChages();
         }
 
-        public void PutTicket(int id, int flightId, decimal price)
+        public void PutTicket(TicketDTO ticketDto)
         {
-            UOW
-                .Set<Ticket>()
-                .Update(new Ticket()
-                {
-                    Id = id,
-                    Price = price,
-                    FlightForeignKey = flightId
-                });
+            if (ticketDto == null)
+                throw new ValidationException("Incorrect input data", "");
+            if (GetTicketsFromDS().FirstOrDefault(t => t.Id == ticketDto.Id) == null)
+                throw new ValidationException($"There is no ticket with Id = {ticketDto.Id}", "");
+            if (GetFlightsFromDS().FirstOrDefault(f => f.Number == ticketDto.FlightNumber) == null)
+                throw new ValidationException($"There is no such FlightNumber={ticketDto.FlightNumber}", "");
+            var ticket = PostPutMapper(ticketDto).Map<Ticket>(ticketDto);
 
+            UOW.Set<Ticket>().Update(ticket);
             UOW.SaveChages();
         }
 

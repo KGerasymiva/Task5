@@ -8,12 +8,12 @@ namespace BL.Service
 {
     public interface IServiceTicket
     {
-        TicketDTO GetTicket(int? id);
+        TicketDTO GetTicket(int id);
         IEnumerable<TicketDTO> GetTickets();
 
-        void PostTicket(int flightId, decimal price);
+        void PostTicket(TicketDTO ticketDto);
         void DeleteTicket(int id);
-        void PutTicket(int id, int flightId, decimal price);
+        void PutTicket(TicketDTO ticketDto);
         
         
         //decimal GetPrice(int? id);

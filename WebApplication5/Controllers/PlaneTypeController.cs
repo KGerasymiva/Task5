@@ -11,26 +11,35 @@ namespace PL.Controllers
     //   [Route("api/PlaneType")]
     public class PlaneTypeController : Controller
     {
-        private IServicePlaneType servicePlaneType;
+        private IService<PlaneTypeDTO> service;
 
-        public PlaneTypeController(IServicePlaneType servicePlaneType)
+        public PlaneTypeController(IService<PlaneTypeDTO> service)
         {
-            this.servicePlaneType = servicePlaneType;
+            this.service = service;
         }
 
         // GET: api/PlaneTypeDTO
         [HttpGet]
-        public IEnumerable<PlaneTypeDTO> Get()
+        public IActionResult Get()
         {
-            return servicePlaneType.GetPlaneTypes();
+            return Ok(service.Get());
         }
 
         // GET: api/PlaneTypeDTO/5
         [HttpGet("{id}")]
-        public PlaneTypeDTO Get(int id)
-        {
-            return servicePlaneType.GetPlaneType(id);
-        }
+        //public PlaneTypeDTO Get(int id)
+        //{
+        //    //try
+        //    //{
+        //    //    var planeType = service.Get(id);
+        //    //    return Ok();
+        //    //}
+        //    //catch (ValidationException e)
+        //    //{
+        //    //    return BadRequest(new { Exception = e.Message });
+        //    //}
+        //    //return service.Get(id);
+        //}
 
         // POST: api/PlaneTypeDTO
         [HttpPost]

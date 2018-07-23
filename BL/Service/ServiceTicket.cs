@@ -112,13 +112,16 @@ namespace BL.Service
 
             if (GetTicketsFromDS().FirstOrDefault(t => t.Id == ticketDto.Id) == null)
                 throw new ValidationException($"There is no ticket with Id = {ticketDto.Id}", "");
-
+            
             if (GetFlightsFromDS().FirstOrDefault(f => f.Number == ticketDto.FlightNumber) == null)
                 throw new ValidationException($"There is no such FlightNumber={ticketDto.FlightNumber}", "");
 
             var ticket = PostPutMapper(ticketDto).Map<Ticket>(ticketDto);
+            UOW.SaveChages();
 
             UOW.Set<Ticket>().Update(ticket);
+           
+            
             UOW.SaveChages();
         }
 

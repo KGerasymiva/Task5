@@ -10,33 +10,53 @@ using DTO;
 
 namespace BL.Service
 {
-    public class ServicePlaneType : IServicePlaneType
+    public class ServicePlaneType : IService<PlaneTypeDTO>
     {
-        IUnitOfWork Database { get; set; }
+        IUnitOfWork UOW { get; set; }
         private IMapper mapper;
 
         public ServicePlaneType(IUnitOfWork uow, IMapper mapper)
         {
-            Database = uow;
+            UOW = uow;
             this.mapper = mapper;
         }
 
-        public IEnumerable<PlaneTypeDTO> GetPlaneTypes()
+        public IEnumerable<PlaneTypeDTO> Get()
         {
-            return mapper.Map<IEnumerable<PlaneTypeDTO>>(Database.Set<PlaneType>().Get());
+            return mapper.Map<IEnumerable<PlaneTypeDTO>>(UOW.Set<PlaneType>().Get());
         }
 
-        public PlaneTypeDTO GetPlaneType(int? id)
+        public PlaneTypeDTO Get(int id)
         {
-            if (id == null)
+            if (id == 0)
                 throw new ValidationException("There is no plane type", "");
 
-            var planeType = Database.Set<PlaneType>().Get().FirstOrDefault(x => x.Id == id.Value);
+            var planeType = UOW.Set<PlaneType>().Get().FirstOrDefault(x => x.Id == id);
 
             if (planeType == null)
                 throw new ValidationException("PlaneType not found", "");
 
             return mapper.Map<PlaneTypeDTO>(planeType);
+        }
+
+        public void Post(PlaneTypeDTO planeTypeDTO)
+        {
+            var planeType = mapper.Map<PlaneType>(planeTypeDTO);
+            UOW.Set<PlaneType>().Create(planeType);
+            UOW.SaveChages();
+        }
+
+        public void Put(PlaneTypeDTO planeTypeDTO)
+        {
+            var planeType = mapper.Map<PlaneType>(planeTypeDTO);
+            UOW.Set<PlaneType>().Update(planeType);
+            UOW.SaveChages();
+        }
+
+        public void Delete(int id)
+        {
+            UOW.Set<PlaneType>().Delete(id);
+            UOW.SaveChages();
         }
     }
 }

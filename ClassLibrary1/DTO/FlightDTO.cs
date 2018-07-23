@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DTO
 {
-    public class FlightDTO
+    public class FlightDTO : IEntityDTO
     {
         public int Id { get; set; }
         public string Number { get; set; }

@@ -2,7 +2,7 @@
 
 namespace DTO
 {
-    public class PilotDTO
+    public class PilotDTO : IEntityDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

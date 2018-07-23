@@ -37,7 +37,7 @@ namespace PL
         {
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddTransient<IService<TicketDTO>, ServiceTicket>();
-            services.AddTransient<IServicePlaneType, ServicePlaneType>();
+            services.AddTransient<IService<PlaneTypeDTO>, ServicePlaneType>();
             services.AddTransient<IMapper, Mapper>();
             services.AddTransient<IRepository<Entity>, Repository<Entity>>();
 
